@@ -13,11 +13,11 @@ router.post('/', (req, res) => {
             date: new Date(),
             likes: req.body.likes,
             user: req.body.user,
-            hashtags: [req.body.hashtags]
+           // hashtags: [req.body.hashtags]
         });
   
         newTweet.save().then(newDoc => {
-          res.json({ result: true, content: newDoc.content });
+          res.json({ result: true, tweet: newDoc });
         });
      
     });
@@ -35,11 +35,9 @@ router.post('/', (req, res) => {
     });
 
     router.delete('/', (req, res) => {
-        Tweet.deleteMany().then(() => {
- 
-            return res.json({result: true, report: data});
-           
-           });
+        Tweet.deleteOne({_id:req.body._id}).then((data) => {
+            res.json({ result: true, tweet: data });
+           }).then(() => {});
     });
     
 

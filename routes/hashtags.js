@@ -22,25 +22,34 @@ router.get('/:hashtagName', (req, res) => {
     Hashtag.findOne({ hashtagName: req.body.hashtagName })
     .populate('tweets')
     .then(data => {
-      if (data) {
+      if (data && data.tweets.includes(req.body.tweetsId)) {
         Hashtag.updateOne(
             {hashtagName: req.body.hashtagName},
-            {$addToSet: { tweets: req.body.tweetsId }})
+            {$push: { tweets: req.body.tweetsId }})
         .populate('tweets')
-        res.json({ result: true, hashtag:data});
-      } else {
+        .then(() => {}).then((data) => {
+          return res.json({ result: true, hashtag: data});})
+        
+      } else if (data === null) {
         const newHashtag = new Hashtag({
             hashtagName: req.body.hashtagName,
-            tweets: [req.body.tweetsId]
+            tweets: [req.body._id]
             
           });
     
           newHashtag.save().then(newDoc => {
             res.json({ result: true, hashtag: newDoc });
           });
+      } else {
+        return res.json({ result: false, error: 'tweet already added'});
       }
     });
   });
 
+  router.delete('/', (req, res) => {
+    Hashtag.deleteOne({hashtagName:req.body.hashtagName}).then((data) => {
+        return res.json({ result: true, hashtag: data });
+       }).then(() => {});
+  });
 
   module.exports = router
