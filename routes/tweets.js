@@ -8,10 +8,9 @@ router.post('/', (req, res) => {
       res.json({ result: false, error: 'Missing or empty fields' });
       return;
     }
-
         const newTweet = new Tweet({
             content: req.body.content,
-            date: req.body.date,
+            date: new Date(),
             likes: req.body.likes,
             user: req.body.user,
             hashtags: [req.body.hashtags]
@@ -23,5 +22,25 @@ router.post('/', (req, res) => {
      
     });
   
+
+
+    router.get('/', (req, res) => {
+        Tweet.find().populate('user').then(data => {
+          if (data.length > 0) {
+            res.json({ result: true, tweets: data });
+          } else {
+            res.json({ result: false, error: 'No tweet found'});
+          }
+        });
+    });
+
+    router.delete('/', (req, res) => {
+        Tweet.deleteMany().then(() => {
+ 
+            return res.json({result: true, report: data});
+           
+           });
+    });
+    
 
 module.exports = router;
