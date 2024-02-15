@@ -7,7 +7,7 @@ const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.post('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
