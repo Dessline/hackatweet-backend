@@ -6,10 +6,33 @@ const { checkBody } = require('../modules/checkBody');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
-/* GET users listing. */
-router.post('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+
+router.post('/signup', (req, res) => {
+  if (!checkBody(req.body, ['username', 'password'])) {
+    res.json({ result: false, error: 'Missing or empty fields' });
+    
+    User.findOne({ username: req.body.username }).then(data => {
+      if (data === null) {
+        const hash = bcrypt.hashSync(req.body.password, 10);
+  
+        const newUser = new User({
+          username: req.body.username,
+          password: hash,
+          token: uid2(32),
+          canBookmark: true,
+        });
+
+    )
+  
+
+
+    return;
+  }
+  
+})
+
+
+
 
 module.exports = router;
 
