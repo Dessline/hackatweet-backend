@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
-const {ObjectId} = require("mongoose").Types
+const { checkBody } = require('../modules/checkBody');
 require('../models/connection');
+const {ObjectId} = require("mongoose").Types
 const Hashtag = require('../models/hashtags');
 
 
@@ -19,29 +20,33 @@ router.get('/:hashtagName', (req, res) => {
   });
 
   router.post('/', (req, res) => {
+
+    if (!checkBody(req.body, ['hashtagName', 'tweetsId'])) {
+      res.json({ result: false, error: 'Missing or empty fields' });
+      return;
+    }
+
     Hashtag.findOne({ hashtagName: req.body.hashtagName })
-    .populate('tweets')
+    //.populate('tweets')
     .then(data => {
-      if (data && data.tweets.includes(req.body.tweetsId)) {
+      if (data /*&& !data.tweets.includes(new ObjectId(String(req.body.tweetsId)))*/) {
         Hashtag.updateOne(
             {hashtagName: req.body.hashtagName},
-            {$push: { tweets: req.body.tweetsId }})
-        .populate('tweets')
-        .then(() => {}).then((data) => {
-          return res.json({ result: true, hashtag: data});})
+            {$addToSet: { tweets: req.body.tweetsId }})
+        //.populate('tweets')
+        .then((data) => {
+          return res.json({ result: data.modifiedCount, hashtag: data});
+        })
         
-      } else if (data === null) {
+      } else {
         const newHashtag = new Hashtag({
             hashtagName: req.body.hashtagName,
-            tweets: [req.body._id]
-            
+            tweets: [req.body.tweetsId]
           });
     
           newHashtag.save().then(newDoc => {
             res.json({ result: true, hashtag: newDoc });
           });
-      } else {
-        return res.json({ result: false, error: 'tweet already added'});
       }
     });
   });
