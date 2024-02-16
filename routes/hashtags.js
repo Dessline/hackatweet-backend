@@ -27,7 +27,7 @@ router.get('/:hashtagName', (req, res) => {
             {hashtagName: req.body.hashtagName},
             {$push: { tweets: req.body.tweetsId }})
         .populate('tweets')
-        .then(() => {}).then((data) => {
+        .then((data) => {
           return res.json({ result: true, hashtag: data});})
         
       } else if (data === null) {
